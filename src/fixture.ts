@@ -55,15 +55,18 @@ function createApiRequestContextProxy(
             }
           }
           
-          // Capture request
-          const capturedRequest = await spy.captureRequest(method, url, {
-            headers,
-            data: options?.data,
-          });
-          
           try {
-            // Execute original request
+            // Execute original request first to get actual URL from response
             const response: APIResponse = await (originalValue as Function).call(target, url, options);
+            
+            // Use response.url() for the actual full URL (handles redirects, base URL, etc.)
+            const actualUrl = response.url();
+            
+            // Capture request with actual URL
+            const capturedRequest = await spy.captureRequest(method, actualUrl, {
+              headers,
+              data: options?.data,
+            });
             
             // Capture response
             if (capturedRequest) {
@@ -102,6 +105,12 @@ function createApiRequestContextProxy(
             
             return response;
           } catch (error) {
+            // For errors, capture request with original URL since we don't have response
+            const capturedRequest = await spy.captureRequest(method, url, {
+              headers,
+              data: options?.data,
+            });
+            
             // Capture error
             if (capturedRequest) {
               await spy.captureError(capturedRequest, error as Error);
@@ -161,9 +170,19 @@ export const test = base.extend<ApiSpyFixtures>({
     
     // Attach to Playwright report if enabled
     if (config.attachToPlaywrightReport && entries.length > 0) {
-      const attachmentContent = JSON.stringify(entries, null, 2);
-      await testInfo.attach('api-spy-requests', {
-        body: Buffer.from(attachmentContent),
+      // Attach requests
+      const requests = entries.map(e => e.request);
+      await testInfo.attach('requests', {
+        body: Buffer.from(JSON.stringify(requests, null, 2)),
+        contentType: 'application/json',
+      });
+      
+      // Attach responses
+      const responses = entries
+        .filter(e => e.response)
+        .map(e => ({ requestId: e.request.id, ...e.response }));
+      await testInfo.attach('responses', {
+        body: Buffer.from(JSON.stringify(responses, null, 2)),
         contentType: 'application/json',
       });
     }
@@ -191,9 +210,19 @@ export const testWithApiSpy = base.extend<ApiSpyFixtures & { request: APIRequest
     
     // Attach to Playwright report if enabled
     if (config.attachToPlaywrightReport && entries.length > 0) {
-      const attachmentContent = JSON.stringify(entries, null, 2);
-      await testInfo.attach('api-spy-requests', {
-        body: Buffer.from(attachmentContent),
+      // Attach requests
+      const requests = entries.map(e => e.request);
+      await testInfo.attach('requests', {
+        body: Buffer.from(JSON.stringify(requests, null, 2)),
+        contentType: 'application/json',
+      });
+      
+      // Attach responses
+      const responses = entries
+        .filter(e => e.response)
+        .map(e => ({ requestId: e.request.id, ...e.response }));
+      await testInfo.attach('responses', {
+        body: Buffer.from(JSON.stringify(responses, null, 2)),
         contentType: 'application/json',
       });
     }
