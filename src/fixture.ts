@@ -22,11 +22,30 @@ interface FetchOptions {
 }
 
 /**
+ * Resolves a potentially relative URL to an absolute URL
+ */
+function resolveUrl(inputUrl: string, responseUrl: string): string {
+  // If response URL is absolute, use it
+  if (responseUrl.startsWith('http://') || responseUrl.startsWith('https://')) {
+    return responseUrl;
+  }
+  
+  // If input URL is absolute, use it
+  if (inputUrl.startsWith('http://') || inputUrl.startsWith('https://')) {
+    return inputUrl;
+  }
+  
+  // Both are relative - return response URL as-is (will be shown as relative path)
+  return responseUrl;
+}
+
+/**
  * Creates APIRequestContext wrapper that intercepts requests
  */
 function createApiRequestContextProxy(
   context: APIRequestContext,
-  spy: ApiSpyInstance
+  spy: ApiSpyInstance,
+  baseURL?: string
 ): APIRequestContext {
   const methodsToIntercept = ['get', 'post', 'put', 'patch', 'delete', 'head', 'fetch'] as const;
   
@@ -59,8 +78,16 @@ function createApiRequestContextProxy(
             // Execute original request first to get actual URL from response
             const response: APIResponse = await (originalValue as Function).call(target, url, options);
             
-            // Use response.url() for the actual full URL (handles redirects, base URL, etc.)
-            const actualUrl = response.url();
+            // Get URL - response.url() should be absolute, but may be relative in some cases
+            let actualUrl = response.url();
+            
+            // If response URL is relative and we have baseURL, construct full URL
+            if (baseURL && !actualUrl.startsWith('http://') && !actualUrl.startsWith('https://')) {
+              // Construct full URL from baseURL
+              const base = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+              const path = actualUrl.startsWith('/') ? actualUrl : '/' + actualUrl;
+              actualUrl = base + path;
+            }
             
             // Capture request with actual URL
             const capturedRequest = await spy.captureRequest(method, actualUrl, {
@@ -154,8 +181,11 @@ export const test = base.extend<ApiSpyFixtures>({
       line: testInfo.line,
     });
     
+    // Get baseURL from project config
+    const baseURL = testInfo.project.use.baseURL;
+    
     // Replace original request context with proxy
-    const proxiedRequest = createApiRequestContextProxy(request, spy);
+    const proxiedRequest = createApiRequestContextProxy(request, spy, baseURL);
     
     // Replace request in testInfo so tests use proxy
     // @ts-expect-error - modifying private field
@@ -170,21 +200,31 @@ export const test = base.extend<ApiSpyFixtures>({
     
     // Attach to Playwright report if enabled
     if (config.attachToPlaywrightReport && entries.length > 0) {
-      // Attach requests
-      const requests = entries.map(e => e.request);
-      await testInfo.attach('requests', {
-        body: Buffer.from(JSON.stringify(requests, null, 2)),
-        contentType: 'application/json',
-      });
-      
-      // Attach responses
-      const responses = entries
-        .filter(e => e.response)
-        .map(e => ({ requestId: e.request.id, ...e.response }));
-      await testInfo.attach('responses', {
-        body: Buffer.from(JSON.stringify(responses, null, 2)),
-        contentType: 'application/json',
-      });
+      for (const entry of entries) {
+        const { request, response, error } = entry;
+        
+        // Attach request
+        await testInfo.attach(`Request ${request.method} ${request.url}`, {
+          body: Buffer.from(JSON.stringify(request, null, 2)),
+          contentType: 'application/json',
+        });
+        
+        // Attach response if exists
+        if (response) {
+          await testInfo.attach(`Response ${response.status} ${request.method} ${request.url}`, {
+            body: Buffer.from(JSON.stringify(response, null, 2)),
+            contentType: 'application/json',
+          });
+        }
+        
+        // Attach error if exists
+        if (error) {
+          await testInfo.attach(`Error ${request.method} ${request.url}`, {
+            body: Buffer.from(JSON.stringify(error, null, 2)),
+            contentType: 'application/json',
+          });
+        }
+      }
     }
   },
 });
@@ -196,6 +236,9 @@ export const testWithApiSpy = base.extend<ApiSpyFixtures & { request: APIRequest
   apiSpy: async ({}, use, testInfo) => {
     const config = globalApiSpyStore.config;
     const spy = new ApiSpyInstance(config);
+    
+    // Store baseURL for request proxy
+    (spy as ApiSpyInstance & { _baseURL?: string })._baseURL = testInfo.project.use.baseURL;
     
     spy.setTestInfo({
       title: testInfo.title,
@@ -210,27 +253,38 @@ export const testWithApiSpy = base.extend<ApiSpyFixtures & { request: APIRequest
     
     // Attach to Playwright report if enabled
     if (config.attachToPlaywrightReport && entries.length > 0) {
-      // Attach requests
-      const requests = entries.map(e => e.request);
-      await testInfo.attach('requests', {
-        body: Buffer.from(JSON.stringify(requests, null, 2)),
-        contentType: 'application/json',
-      });
-      
-      // Attach responses
-      const responses = entries
-        .filter(e => e.response)
-        .map(e => ({ requestId: e.request.id, ...e.response }));
-      await testInfo.attach('responses', {
-        body: Buffer.from(JSON.stringify(responses, null, 2)),
-        contentType: 'application/json',
-      });
+      for (const entry of entries) {
+        const { request, response, error } = entry;
+        
+        // Attach request
+        await testInfo.attach(`Request ${request.method} ${request.url}`, {
+          body: Buffer.from(JSON.stringify(request, null, 2)),
+          contentType: 'application/json',
+        });
+        
+        // Attach response if exists
+        if (response) {
+          await testInfo.attach(`Response ${response.status} ${request.method} ${request.url}`, {
+            body: Buffer.from(JSON.stringify(response, null, 2)),
+            contentType: 'application/json',
+          });
+        }
+        
+        // Attach error if exists
+        if (error) {
+          await testInfo.attach(`Error ${request.method} ${request.url}`, {
+            body: Buffer.from(JSON.stringify(error, null, 2)),
+            contentType: 'application/json',
+          });
+        }
+      }
     }
   },
   
-  request: async ({ request, apiSpy }, use) => {
+  request: async ({ request, apiSpy }, use, testInfo) => {
     // Create proxy for request context
-    const proxiedRequest = createApiRequestContextProxy(request, apiSpy as ApiSpyInstance);
+    const baseURL = testInfo.project.use.baseURL;
+    const proxiedRequest = createApiRequestContextProxy(request, apiSpy as ApiSpyInstance, baseURL);
     await use(proxiedRequest);
   },
 });

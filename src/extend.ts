@@ -68,11 +68,31 @@ export function extendWithApiSpy<
       
       // Attach to Playwright report if enabled
       if (config.attachToPlaywrightReport && entries.length > 0) {
-        const attachmentContent = JSON.stringify(entries, null, 2);
-        await testInfo.attach('api-spy-requests', {
-          body: Buffer.from(attachmentContent),
-          contentType: 'application/json',
-        });
+        for (const entry of entries) {
+          const { request, response, error } = entry;
+          
+          // Attach request
+          await testInfo.attach(`Request ${request.method} ${request.url}`, {
+            body: Buffer.from(JSON.stringify(request, null, 2)),
+            contentType: 'application/json',
+          });
+          
+          // Attach response if exists
+          if (response) {
+            await testInfo.attach(`Response ${response.status} ${request.method} ${request.url}`, {
+              body: Buffer.from(JSON.stringify(response, null, 2)),
+              contentType: 'application/json',
+            });
+          }
+          
+          // Attach error if exists
+          if (error) {
+            await testInfo.attach(`Error ${request.method} ${request.url}`, {
+              body: Buffer.from(JSON.stringify(error, null, 2)),
+              contentType: 'application/json',
+            });
+          }
+        }
       }
     },
     
@@ -137,11 +157,31 @@ export function extendWithApiSpyFixture<
       
       // Attach to Playwright report if enabled
       if (config.attachToPlaywrightReport && entries.length > 0) {
-        const attachmentContent = JSON.stringify(entries, null, 2);
-        await testInfo.attach('api-spy-requests', {
-          body: Buffer.from(attachmentContent),
-          contentType: 'application/json',
-        });
+        for (const entry of entries) {
+          const { request, response, error } = entry;
+          
+          // Attach request
+          await testInfo.attach(`Request ${request.method} ${request.url}`, {
+            body: Buffer.from(JSON.stringify(request, null, 2)),
+            contentType: 'application/json',
+          });
+          
+          // Attach response if exists
+          if (response) {
+            await testInfo.attach(`Response ${response.status} ${request.method} ${request.url}`, {
+              body: Buffer.from(JSON.stringify(response, null, 2)),
+              contentType: 'application/json',
+            });
+          }
+          
+          // Attach error if exists
+          if (error) {
+            await testInfo.attach(`Error ${request.method} ${request.url}`, {
+              body: Buffer.from(JSON.stringify(error, null, 2)),
+              contentType: 'application/json',
+            });
+          }
+        }
       }
     },
   });

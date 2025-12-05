@@ -6,7 +6,7 @@ export default defineConfig(withApiSpy({
   use: {
     baseURL: 'https://jsonplaceholder.typicode.com',
   },
-  reporter: [['list'], ['./dist/reporter.js']],
+  reporter: [['list'], ['html'], ['./dist/reporter.js']],
 }, {
   console: false,
   verbosity: 'normal',
