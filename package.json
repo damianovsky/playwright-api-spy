@@ -1,0 +1,73 @@
+{
+  "name": "playwright-api-spy",
+  "version": "1.0.0",
+  "description": "A Playwright plugin for capturing and logging API requests/responses with beautiful HTML and JSON reports",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "bin": {
+    "playwright-api-spy": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:tsc": "tsc",
+    "dev": "tsup --watch",
+    "test": "playwright test",
+    "test:unit": "playwright test tests/unit/",
+    "test:e2e": "playwright test tests/e2e/",
+    "report": "node dist/cli.js show-report",
+    "docs": "mkdocs serve",
+    "docs:build": "mkdocs build",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "playwright",
+    "api",
+    "spy",
+    "logging",
+    "testing",
+    "report",
+    "http",
+    "rest",
+    "debug"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damianovsky/playwright-api-spy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/damianovsky/playwright-api-spy/issues"
+  },
+  "homepage": "https://github.com/damianovsky/playwright-api-spy#readme",
+  "peerDependencies": {
+    "@playwright/test": ">=1.30.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./reporter": {
+      "types": "./dist/reporter.d.ts",
+      "import": "./dist/reporter.js",
+      "require": "./dist/reporter.js"
+    }
+  }
+}

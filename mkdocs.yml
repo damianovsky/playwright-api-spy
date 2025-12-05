@@ -1,0 +1,50 @@
+site_name: Playwright API Spy
+site_description: A Playwright plugin for capturing and logging API requests/responses
+site_url: https://playwright-api-spy.docs.example.com
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: green
+      accent: green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: green
+      accent: green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - content.code.annotate
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+  - Configuration:
+    - Options: configuration/options.md
+    - Filtering: configuration/filtering.md
+    - Redaction: configuration/redaction.md
+  - API Reference:
+    - apiSpy Fixture: api/fixture.md
+    - Types: api/types.md
+  - Reports:
+    - HTML Report: reports/html.md
+    - JSON Report: reports/json.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - tables
