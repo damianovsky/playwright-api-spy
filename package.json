@@ -1,6 +1,6 @@
 {
   "name": "playwright-api-spy",
-  "version": "1.0.0",
+  "version": "v1.0.0-beta.4",
   "description": "A Playwright plugin for capturing and logging API requests/responses with beautiful HTML and JSON reports",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
