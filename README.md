@@ -1,9 +1,16 @@
-# playwright-api-spy
+<p align="center">
+  <h1 align="center">playwright-api-spy</h1>
+  <p align="center">
+    Capture and log API requests/responses with beautiful HTML and JSON reports
+  </p>
+  <p align="center">
+    <a href="https://github.com/damianovsky/playwright-api-spy/releases"><img src="https://img.shields.io/github/v/release/damianovsky/playwright-api-spy?include_prereleases" alt="GitHub release"></a>
+    <a href="https://www.npmjs.com/package/playwright-api-spy"><img src="https://img.shields.io/npm/v/playwright-api-spy.svg" alt="npm version"></a>
+    <a href="https://github.com/damianovsky/playwright-api-spy/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/playwright-api-spy.svg" alt="license"></a>
+  </p>
+</p>
 
-[![npm version](https://badge.fury.io/js/playwright-api-spy.svg)](https://www.npmjs.com/package/playwright-api-spy)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-A Playwright plugin for capturing and logging API requests/responses with beautiful HTML and JSON reports.
+---
 
 ## Features
 
@@ -119,8 +126,4 @@ interface ApiSpy {
 
 ## Documentation
 
-Full documentation available at: [https://playwright-api-spy.docs.example.com](https://playwright-api-spy.docs.example.com)
-
-## License
-
-MIT © 2024
+📖 **[Full Documentation](https://damianovsky.github.io/playwright-api-spy)**
