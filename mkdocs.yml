@@ -1,27 +1,30 @@
-site_name: Playwright API Spy
+site_name: playwright-api-spy
 site_description: A Playwright plugin for capturing and logging API requests/responses
-site_url: https://playwright-api-spy.docs.example.com
+site_url: https://damianovsky.github.io/playwright-api-spy
+
+repo_name: damianovsky/playwright-api-spy
+repo_url: https://github.com/damianovsky/playwright-api-spy
 
 theme:
   name: material
   palette:
-    - scheme: slate
-      primary: green
-      accent: green
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
     - scheme: default
       primary: green
       accent: green
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+    - scheme: slate
+      primary: green
+      accent: green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   features:
     - navigation.sections
     - navigation.expand
     - content.code.copy
-    - content.code.annotate
+    - search.highlight
 
 nav:
   - Home: index.md
