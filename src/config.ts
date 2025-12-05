@@ -126,3 +126,28 @@ export function withApiSpy<T extends PlaywrightTestConfig>(
 export function defineApiSpyConfig(config: ApiSpyConfig): Required<ApiSpyConfig> {
   return mergeApiSpyConfig(config);
 }
+
+/**
+ * Gets the current API Spy configuration from the global store.
+ * 
+ * This is useful when creating custom fixtures that need access to the config
+ * set via `withApiSpy()`.
+ * 
+ * @returns The current API Spy configuration
+ * 
+ * @example
+ * ```typescript
+ * import { getApiSpyConfig, ApiSpyInstance } from 'playwright-api-spy';
+ * 
+ * export const test = baseTest.extend({
+ *   customApiSpy: async ({}, use, testInfo) => {
+ *     const config = getApiSpyConfig();
+ *     const spy = new ApiSpyInstance(config);
+ *     // ...
+ *   },
+ * });
+ * ```
+ */
+export function getApiSpyConfig(): Required<ApiSpyConfig> {
+  return globalApiSpyStore.config;
+}

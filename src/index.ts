@@ -1,7 +1,14 @@
 // Main exports
-export { withApiSpy, defineApiSpyConfig } from './config.js';
+export { withApiSpy, defineApiSpyConfig, getApiSpyConfig } from './config.js';
 export { test, testWithApiSpy, expect, ApiSpyReporter } from './fixture.js';
 export { ApiSpyInstance, globalApiSpyStore } from './api-spy.js';
+
+// Extension utilities for custom test objects
+export { extendWithApiSpy, extendWithApiSpyFixture } from './extend.js';
+export type { ApiSpyFixtures, ApiSpyFixturesWithRequest } from './extend.js';
+
+// Wrapper for custom APIRequestContext
+export { wrapWithApiSpy, isAPIRequestContext } from './wrapper.js';
 
 // Types
 export type {
@@ -34,6 +41,3 @@ export { redactRequest, redactResponse } from './redact.js';
 
 // Console formatter
 export { ConsoleFormatter } from './console-formatter.js';
-
-// Fixture types
-export type { ApiSpyFixtures } from './fixture.js';

@@ -28,6 +28,7 @@ nav:
   - Getting Started:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quick-start.md
+    - Custom Test Integration: getting-started/custom-integration.md
   - Configuration:
     - Options: configuration/options.md
     - Filtering: configuration/filtering.md
